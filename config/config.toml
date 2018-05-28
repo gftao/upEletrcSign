@@ -1,0 +1,15 @@
+[MAIN]
+runmode="ENV"
+logFileName="./config/logr.conf"
+
+[server]
+host = "192.168.127.63"
+#ports = [ 8001, 8001, 8002 ]
+port = 8001
+readTimeout = 30
+writeTimeout = 30
+#certFile=
+#keyFile=
+[database]
+connection_max = 5000
+enabled = true
