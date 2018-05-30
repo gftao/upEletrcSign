@@ -1,9 +1,9 @@
 package comm
 
 import (
-	"github.com/spf13/viper"
 	"fmt"
-	"upEletrcSign/config"
+	"mygolib/modules/config"
+	"mygolib/modules/myLogger"
 	"errors"
 	"time"
 	"os"
@@ -27,21 +27,22 @@ type HttpSvr struct {
 
 func (t *HttpSvr) InitConfig() error {
 
-	if !config.HasModuleInit() {
+	if !config.HasConfigInit() {
 		return errors.New("配置文件未初始化，请先初始化")
 	}
-
-	pt := viper.GetInt("server.port")
-	if pt <= 0 {
-		return fmt.Errorf("port formate not crrect:%v", pt)
+	if !myLogger.HasLoggerInit() {
+		return errors.New("日志模块未初始化，请先初始化")
 	}
+
+	config.SetSection("server")
+
 	cf := &httpSvrConf{}
-	cf.ListenIp = viper.GetString("server.host")
-	cf.ListenPort = pt
-	cf.RecvTimeOut = viper.GetInt("server.readTimeout")
-	cf.WriteTimeOut = viper.GetInt("server.writeTimeout")
+	cf.ListenIp = config.StringDefault("host", "")
+	cf.ListenPort = config.IntDefault("port", 9090)
+	cf.RecvTimeOut = config.IntDefault("readTimeout",30)
+	cf.WriteTimeOut = config.IntDefault("writeTimeout",30)
 	t.conf = cf
-	fmt.Println("Svr 加载成功")
+	fmt.Println("HttpSvr加载成功")
 
 	return nil
 }
@@ -55,6 +56,8 @@ func (t *HttpSvr) RunSvr(h http.Handler) {
 	}
 
 	go func() {
+		defer myLogger.Info("----HttpSvr关闭----")
+		myLogger.Info("----HttpSvr启动----")
 		if err := srv.ListenAndServe(); err != nil {
 			log.Println(err)
 		}

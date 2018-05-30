@@ -5,8 +5,7 @@ import (
 	"mygolib/gerror"
 	"encoding/json"
 	"mygolib/modules/myLogger"
-	"upEletrcSign/textCvtImge"
-	"github.com/vdobler/chart/imgg"
+ 	"github.com/vdobler/chart/imgg"
 	"image/color"
 	"github.com/vdobler/chart"
 	"strconv"
@@ -23,8 +22,7 @@ import (
 type T8262 struct {
 	reqMsg  *trans.TransMessage
 	Poses   *trans.Spos
-	tc      *textCvtImge.TextConvert
-	Font    string
+ 	Font    string
 	picPath string
 	logo    image.Image
 }
