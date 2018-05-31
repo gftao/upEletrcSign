@@ -10,8 +10,6 @@ import (
 	"upEletrcSign/handle"
 	"upEletrcSign/comm"
 	"mygolib/modules/myLogger"
-	"mygolib/modules/cache"
-	"mygolib/modules/gormdb"
 	"upEletrcSign/trans"
 	"flag"
 )
@@ -39,19 +37,19 @@ func main() {
 	myLogger.Infoln("初始化日志")
 
 	//初始化db
-	err = gormdb.InitModule()
-	if err != nil {
-		fmt.Println("初始化数据库失败", err)
-		return
-	}
-	myLogger.Infoln("初始化数据库")
+	//err = gormdb.InitModule()
+	//if err != nil {
+	//	fmt.Println("初始化数据库失败", err)
+	//	return
+	//}
+	//myLogger.Infoln("初始化数据库")
 	//初始化缓存管理器
-	err = cache.InitModule()
-	if err != nil {
-		fmt.Println("初始化缓存管理器失败", err)
-		return
-	}
-	myLogger.Infoln("初始化缓存管理器")
+	//err = cache.InitModule()
+	//if err != nil {
+	//	fmt.Println("初始化缓存管理器失败", err)
+	//	return
+	//}
+	//myLogger.Infoln("初始化缓存管理器")
 	//初始化全局配置参数
 	err = trans.InitArgv()
 	if err != nil {
