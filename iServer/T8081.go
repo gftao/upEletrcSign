@@ -5,7 +5,7 @@ import (
 	"mygolib/gerror"
 	"encoding/json"
 	"mygolib/modules/myLogger"
- 	"github.com/vdobler/chart/imgg"
+	"github.com/vdobler/chart/imgg"
 	"image/color"
 	"github.com/vdobler/chart"
 	"strconv"
@@ -22,7 +22,7 @@ import (
 type T8262 struct {
 	reqMsg  *trans.TransMessage
 	Poses   *trans.Spos
- 	Font    string
+	Font    string
 	picPath string
 	logo    image.Image
 }
@@ -37,17 +37,31 @@ func (t *T8262) Init() gerror.IError {
 	return nil
 }
 
-func (t *T8262) DoTrans(msg *trans.TransMessage) ([]byte, gerror.IError) {
+func (t *T8262) DoTrans(msg *trans.TransMessage) (gerror.IError) {
 	t.reqMsg = msg
 	//t.Poses = make(trans.Spos, 10)
 	t.Poses = &trans.Spos{}
-
 	err := json.Unmarshal([]byte(msg.MsgBody.UPos_sign), &t.Poses)
 	if err != nil {
-		return nil, gerror.NewR(2001, err, "解析Poses失败")
+		return gerror.NewR(2001, err, "解析Poses失败")
 	}
 	myLogger.Debugf("Poses: %+v", len(t.Poses.Pos))
+	t.picPath = t.picPath + msg.MsgBody.Orig_sys_order_id[:8] + "/"
+	exist := t.FileIfExit()
+	if !exist {
+		err := os.MkdirAll(t.picPath, os.ModePerm)
+		if err != nil {
+			return gerror.NewR(2009, err, "MkdirAll失败：%s", t.picPath)
+		}
+	}
 	t.picPath = t.picPath + msg.MsgBody.Orig_sys_order_id + ".png"
+	myLogger.Infoln("文件是路径: ", t.picPath)
+
+	exist = t.FileIfExit()
+	myLogger.Infoln("文件是否已存在: ", exist)
+	if exist {
+		return gerror.NewR(2007, nil, "文件已存在：%s", t.picPath)
+	}
 	//white := color.RGBA{220, 220, 220, 255}
 	white := color.RGBA{255, 255, 255, 255}
 	height := 0
@@ -114,7 +128,7 @@ func (t *T8262) DoTrans(msg *trans.TransMessage) ([]byte, gerror.IError) {
 				if v.Content == "<%pic_type:sign%>" {
 					m, err := t.decode()
 					if err != nil {
-						return nil, err
+						return err
 					}
 					si := m.Bounds()
 					sp := si.Size()
@@ -131,13 +145,13 @@ func (t *T8262) DoTrans(msg *trans.TransMessage) ([]byte, gerror.IError) {
 	}
 	file, err := os.Create(t.picPath)
 	if err != nil {
-		myLogger.Error(err)
+		return gerror.NewR(2008, err, "Create file failed.")
 	}
 	defer file.Close()
 
 	png.Encode(file, g.Image)
 
-	return nil, nil
+	return nil
 }
 
 func checkPosition(pos string, x int) (int, string) {
@@ -168,4 +182,12 @@ func (t *T8262) decode() (image.Image, gerror.IError) {
 	t.reqMsg.MsgBody.Pos_sign = ""
 	t.reqMsg.MsgBody.Sign_img = ""
 	return im, nil
+}
+
+func (t *T8262) FileIfExit() bool {
+	_, err := os.Lstat(t.picPath)
+	if err == nil {
+		return true
+	}
+	return false
 }

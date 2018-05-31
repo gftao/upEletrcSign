@@ -14,7 +14,7 @@ type GetDoTransFunc func(msg *trans.TransMessage) (IDoAppTrans, error)
 
 type IDoAppTrans interface {
 	Init() gerror.IError
-	DoTrans(*trans.TransMessage) ([]byte, gerror.IError)
+	DoTrans(*trans.TransMessage) (gerror.IError)
 }
 
 func IDoFunct(w http.ResponseWriter, r *http.Request, getTransFunc GetDoTransFunc) {
@@ -56,13 +56,15 @@ func IDoFunct(w http.ResponseWriter, r *http.Request, getTransFunc GetDoTransFun
 		RejectMsg(w, tr, defs.TRN_FORMAT_ERR, err.Error())
 		return
 	}
-	_, gerr = TransFunc.DoTrans(tr)
+	  gerr = TransFunc.DoTrans(tr)
 	if gerr != nil {
 		myLogger.Error("交易处理失败", gerr)
 		RejectMsg(w, tr, gerr.GetErrorCode(), gerr.GetErrorString())
 		return
 	}
 	myLogger.Info("应答处理完成")
+
+	tr.MsgBody.Tran_cd = tr.MsgBody.Tran_cd[:3] + "2"
 	tr.MsgBody.Resp_cd = "00"
 	tr.MsgBody.Resp_msg = "SUCCESS"
 	myLogger.Infof("应答报文：[%s]", string(tr.ToString()))
@@ -80,6 +82,8 @@ func RejectMsg(w http.ResponseWriter, msg *trans.TransMessage, resp_cd, resp_msg
 
 	msg.MsgBody.Resp_cd = resp_cd
 	msg.MsgBody.Resp_msg = resp_msg
+	msg.MsgBody.Pos_sign = ""
+	msg.MsgBody.Sign_img = ""
 	msgbody, err := json.Marshal(msg.MsgBody)
 	if err != nil {
 		myLogger.Error("生成应答报文失败", err)
@@ -87,7 +91,7 @@ func RejectMsg(w http.ResponseWriter, msg *trans.TransMessage, resp_cd, resp_msg
 		return
 	}
 	msg.Msg_body = string(msgbody)
-	msg.Signature = trans.Md5Base64(msgbody)
+	//msg.Signature = trans.Md5Base64(msgbody)
 	res, err := json.Marshal(msg)
 	if err != nil {
 		myLogger.Error("生成应答报文失败", err)
