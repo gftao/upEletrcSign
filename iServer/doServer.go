@@ -56,7 +56,7 @@ func IDoFunct(w http.ResponseWriter, r *http.Request, getTransFunc GetDoTransFun
 		RejectMsg(w, tr, defs.TRN_FORMAT_ERR, err.Error())
 		return
 	}
-	  gerr = TransFunc.DoTrans(tr)
+	gerr = TransFunc.DoTrans(tr)
 	if gerr != nil {
 		myLogger.Error("交易处理失败", gerr)
 		RejectMsg(w, tr, gerr.GetErrorCode(), gerr.GetErrorString())
@@ -67,9 +67,10 @@ func IDoFunct(w http.ResponseWriter, r *http.Request, getTransFunc GetDoTransFun
 	tr.MsgBody.Tran_cd = tr.MsgBody.Tran_cd[:3] + "2"
 	tr.MsgBody.Resp_cd = "00"
 	tr.MsgBody.Resp_msg = "SUCCESS"
-	myLogger.Infof("应答报文：[%s]", string(tr.ToString()))
+	rep := tr.ToString()
+	myLogger.Infof("应答报文：[%s]", rep)
 
-	w.Write([]byte(tr.ToString()))
+	w.Write([]byte(rep))
 	return
 }
 

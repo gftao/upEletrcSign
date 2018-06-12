@@ -60,7 +60,7 @@ func (t *T8262) DoTrans(msg *trans.TransMessage) (gerror.IError) {
 	exist = t.FileIfExit()
 	myLogger.Infoln("文件是否已存在: ", exist)
 	if exist {
-		return gerror.NewR(2007, nil, "文件已存在：%s", t.picPath)
+		return nil
 	}
 	//white := color.RGBA{220, 220, 220, 255}
 	white := color.RGBA{255, 255, 255, 255}
@@ -91,9 +91,9 @@ func (t *T8262) DoTrans(msg *trans.TransMessage) (gerror.IError) {
 	x, y := 10, 2
 	for _, v := range t.Poses.Pos {
 		if v != nil {
-			myLogger.Infof(">>%+v", *v)
+			myLogger.Debugf(">>%+v", *v)
 
-			myLogger.Infoln(x, y)
+			myLogger.Debugln(x, y)
 			switch v.Content_type {
 			case "txt":
 				s, _ := strconv.Atoi(v.Size)

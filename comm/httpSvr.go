@@ -39,8 +39,8 @@ func (t *HttpSvr) InitConfig() error {
 	cf := &httpSvrConf{}
 	cf.ListenIp = config.StringDefault("host", "")
 	cf.ListenPort = config.IntDefault("port", 9090)
-	cf.RecvTimeOut = config.IntDefault("readTimeout",30)
-	cf.WriteTimeOut = config.IntDefault("writeTimeout",30)
+	cf.RecvTimeOut = config.IntDefault("readTimeout", 30)
+	cf.WriteTimeOut = config.IntDefault("writeTimeout", 30)
 	t.conf = cf
 	fmt.Println("HttpSvr加载成功")
 
