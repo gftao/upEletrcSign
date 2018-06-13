@@ -124,8 +124,7 @@ func (t *T8262) DoTrans(msg *trans.TransMessage) (gerror.IError) {
 					//fmt.Println("logo:", sp.Y)
 					draw.Draw(g.Image, image.Rect(28, y, sp.X+40, y+sp.Y), t.logo, image.ZP, draw.Src)
 					y = y + sp.Y - 26
-				}
-				if v.Content == "<%pic_type:sign%>" {
+				}else if v.Content == "<%pic_type:sign%>" {
 					m, err := t.decode()
 					if err != nil {
 						return err
