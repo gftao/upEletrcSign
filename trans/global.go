@@ -12,6 +12,7 @@ import (
 	"image"
 	"golang.org/x/image/bmp"
 	"github.com/nfnt/resize"
+	"github.com/gwpp/tinify-go/tinify"
 )
 
 const TermKeyOutTime = 100
@@ -72,6 +73,6 @@ func InitArgv() error {
 	}
 	m := resize.Resize(220, 50, img, resize.Lanczos3)
 	GlobA.Logo = m
-
+	Tinify.SetKey("xz9CbfmSEgaVIkvj8NDTvbJ1SqHjK5Uv")
 	return nil
 }

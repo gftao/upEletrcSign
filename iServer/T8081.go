@@ -17,6 +17,7 @@ import (
 	"image/draw"
 	"bytes"
 	"github.com/boombuler/barcode/qr"
+	"github.com/gwpp/tinify-go/tinify"
 )
 
 type T8262 struct {
@@ -124,7 +125,7 @@ func (t *T8262) DoTrans(msg *trans.TransMessage) (gerror.IError) {
 					//fmt.Println("logo:", sp.Y)
 					draw.Draw(g.Image, image.Rect(28, y, sp.X+40, y+sp.Y), t.logo, image.ZP, draw.Src)
 					y = y + sp.Y - 26
-				}else if v.Content == "<%pic_type:sign%>" {
+				} else if v.Content == "<%pic_type:sign%>" {
 					m, err := t.decode()
 					if err != nil {
 						return err
@@ -142,14 +143,18 @@ func (t *T8262) DoTrans(msg *trans.TransMessage) (gerror.IError) {
 			y = y + 18
 		}
 	}
-	file, err := os.Create(t.picPath)
+	myLogger.Infoln("开始压缩图片")
+	ib := bytes.NewBuffer([]byte{})
+	png.Encode(ib, g.Image)
+	source, err := Tinify.FromBuffer(ib.Bytes())
 	if err != nil {
-		return gerror.NewR(2008, err, "Create file failed.")
+		return gerror.NewR(2008, err, "Tinify file failed.")
 	}
-	defer file.Close()
-
-	png.Encode(file, g.Image)
-
+	err = source.ToFile(t.picPath)
+	if err != nil {
+		return gerror.NewR(2008, err, "Tinify to file failed.")
+	}
+	myLogger.Infoln("压缩完成")
 	return nil
 }
 
